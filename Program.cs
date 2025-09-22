@@ -3,13 +3,15 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
+// 設定 NLog
 builder.Logging.ClearProviders();
 var log = NLog.LogManager.LoadConfiguration("NLog.config").GetCurrentClassLogger();
 builder.Host.UseNLog();
+
+// 設定 Serilog
 builder.Host.UseSerilog((context, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     // .Enrich.FromLogContext()
@@ -23,7 +25,8 @@ var provider = app.Services.GetService<ILoggerProvider>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
